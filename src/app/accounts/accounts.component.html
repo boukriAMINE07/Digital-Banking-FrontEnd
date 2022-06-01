@@ -1,0 +1,99 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col col-md-6">
+      <div class="card">
+        <div class="card-header">Accounts</div>
+        <div class="card-body">
+          <ng-template #errorTemplate>
+            <div class="text-danger" *ngIf="errorMessage;else loading">
+                  {{errorMessage}}
+            </div>
+            <ng-template #loading>
+              Loading ...
+            </ng-template>
+          </ng-template>
+          <form [formGroup]="fromGroupAccount" (ngSubmit)="handleSearchAccount()">
+            <div class="input-group">
+              <input class="form-control me-2" type="search" placeholder="Account ID" formControlName="accountId" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+
+          </form>
+          <ng-container *ngIf="accountObservable|async as accountDetails">
+            <div class="mb-2 mt-2">
+              <label>Account ID : </label>
+              <label ><strong>{{accountDetails.accountId}}</strong></label>
+            </div>
+            <div class="mb-2">
+              <label>Balance : </label>
+              <label ><strong>{{accountDetails.balance | number :'1.2-2'}}</strong></label>
+            </div>
+            <table class="table">
+              <thead>
+                    <th>ID</th><th>Date Operation</th><th>Type</th><th>Amount</th>
+              </thead>
+              <tbody>
+              <tr *ngFor="let op of accountDetails.accountOperationDTOS">
+                <td>{{op.id}}</td>
+                <td>{{op.operationDate|date:'dd-MM-yyYY : HH-mm-ss'}}</td>
+                <td>{{op.type}}</td>
+                <td class="text-end">{{op.amount | number :'1.2-2'}}</td>
+              </tr>
+
+              </tbody>
+            </table>
+              <ul class="nav">
+                <li class="nav-pills m-1" *ngFor="let item of [].constructor(accountDetails.totalPages);let page=index">
+                  <a (click)="goToPage(page)" [ngClass]="currentPage==page?'btn btn-info':'btn btn-outline-info'" >{{page}}</a>
+                </li>
+
+              </ul>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+    <div class="col col-md-6">
+        <div *ngIf="accountObservable" class="card">
+          <div class="card-header">Operations</div>
+          <div class="card-body">
+<!--            {{operationFormGroup.value|json}}-->
+            <form [formGroup]="operationFormGroup" method="post" (ngSubmit)="handleAccountOperation()">
+
+              <div class="form-check form-check-inline">
+                <input type="radio" formControlName="operationType" class="form-check-input" value="DEBIT">
+                <label class="form-check-label">Debit :</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input type="radio" formControlName="operationType" class="form-check-input" value="CREDIT">
+                <label class="form-check-label">Credit :</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input type="radio"  formControlName="operationType" class="form-check-input" value="TRANSFER">
+                <label class="form-check-label">TRANSFER :</label>
+              </div>
+              <div class="mb-3" *ngIf="operationFormGroup.value.operationType=='TRANSFER'">
+                <label class="form-label" >Account Destination :</label>
+                <input type="text" class="form-control"  formControlName="accountDestination">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" >Mount :</label>
+                <input type="text" class="form-control" formControlName="amount">
+              </div>
+              <div class="mb-3">
+                <label class="form-label" >Description :</label>
+                <input type="text" class="form-control" formControlName="description">
+              </div>
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary "> Save Operation</button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+    </div>
+  </div>
+
+
+</div>
